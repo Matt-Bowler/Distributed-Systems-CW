@@ -3,18 +3,9 @@ import azure.functions as func
 
 app = func.FunctionApp()
 
-@app.timer_trigger(schedule="0 */10 * * * *", arg_name="myTimer", run_on_startup=False,
-              use_monitor=False) 
-def image_gen_upload(myTimer: func.TimerRequest) -> None:
-    if myTimer.past_due:
-        logging.info('The timer is past due!')
+from image_gen_upload import img_gen_upload
+from image_compression import img_comp
 
-    logging.info('Python timer trigger function executed.')
+app.register_functions(img_gen_upload) 
+app.register_functions(img_comp) 
 
-
-@app.blob_trigger(arg_name="myblob", path="images",
-                               connection="37924e_STORAGE") 
-def image_compression(myblob: func.InputStream):
-    logging.info(f"Python blob trigger function processed blob"
-                f"Name: {myblob.name}"
-                f"Blob Size: {myblob.length} bytes")
