@@ -11,8 +11,8 @@ import uuid
 img_gen_upload = func.Blueprint()
 
 def generate_image():
-    img_width = random.randint(128, 1920)
-    img_height = random.randint(128, 1080)
+    img_width = random.randint(1080, 3840)
+    img_height = random.randint(1350, 2160)
 
     img_size = (img_width, img_height)
     image = Image.new("RGB", img_size, color=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))) 
@@ -31,7 +31,9 @@ def image_gen_upload(myTimer: func.TimerRequest) -> None:
 
 
     image = generate_image()
-    blob_name = f"image_{datetime.now(timezone.utc).strftime('%Y-%m-%d-%H%M%S')}_{str(uuid.uuid4())}.png"
+    time_stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H%M%S")
+    id = str(uuid.uuid4())
+    blob_name = f"image_{time_stamp}_{id}.png"
 
     try:
         blob_service_client = BlobServiceClient.from_connection_string(os.environ["AZURE_STORAGE_CONNECTION_STRING"])
@@ -41,8 +43,6 @@ def image_gen_upload(myTimer: func.TimerRequest) -> None:
         if not container_client.exists():
             container_client.create_container()
             logging.info(f"Container '{container_name}' created.")
-        else:
-            logging.info(f"Container '{container_name}' already exists.")
 
         blob_client = container_client.get_blob_client(blob_name)
         blob_client.upload_blob(image, overwrite=True)
