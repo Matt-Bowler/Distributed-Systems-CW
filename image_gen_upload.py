@@ -23,18 +23,17 @@ def generate_image():
     return img_byte_arr
 
 
-@img_gen_upload.timer_trigger(schedule="0 */10 * * * *", arg_name="myTimer", run_on_startup=False, use_monitor=False) 
+@img_gen_upload.timer_trigger(schedule="0 * * * * *", arg_name="myTimer", run_on_startup=False, use_monitor=False) 
 def image_gen_upload(myTimer: func.TimerRequest) -> None:
     if myTimer.past_due:
         logging.info('The timer is past due!')
     logging.info('Python timer trigger function executed at %s', datetime.now(timezone.utc))
 
-
     image = generate_image()
     time_stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H%M%S")
     id = str(uuid.uuid4())
     blob_name = f"image_{time_stamp}_{id}.png"
-
+    
     try:
         blob_service_client = BlobServiceClient.from_connection_string(os.environ["AZURE_STORAGE_CONNECTION_STRING"])
         container_name = "images"

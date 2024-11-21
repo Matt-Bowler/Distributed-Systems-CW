@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import azure.functions as func
 import logging
 from PIL import Image
